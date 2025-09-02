@@ -1,5 +1,5 @@
 {
-  "pluginAlias": "Shelly",
+  "pluginAlias": "Homebridge Shelly",
   "pluginType": "platform",
   "singular": true,
   "strictValidation": false,
