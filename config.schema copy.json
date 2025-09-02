@@ -154,6 +154,46 @@
             }
           }
         }
+      },
+      "mdns": {
+        "type": "object",
+        "properties": {
+          "enable": {
+            "title": "Enable",
+            "description": "Whether devices should be automatically discovered using mDNS.",
+            "type": "boolean",
+            "default": true
+          },
+          "interface": {
+            "title": "Network interface",
+            "description": "The network interface to use when sending and receiving mDNS packets. You probably don't need to use this setting unless you know what you're doing. If not specified, all available network interfaces will be used.",
+            "type": "string",
+            "placeholder": "e.g. eth0 or 192.168.1.100"
+          }
+        }
+      },
+      "websocket": {
+        "type": "object",
+        "properties": {
+          "requestTimeout": {
+            "title": "Request timeout",
+            "type": "integer",
+            "placeholder": "10",
+            "description": "The time, in seconds, to wait for a response before a request is aborted."
+          },
+          "pingInterval": {
+            "title": "Ping interval",
+            "type": "integer",
+            "placeholder": "60",
+            "description": "The interval, in seconds, at which ping requests should be made to verify that the connection is open. Set to 0 to disable."
+          },
+          "reconnectInterval": {
+            "title": "Reconnect intervals",
+            "type": "string",
+            "placeholder": "5,10,30,60,300,600",
+            "description": "The interval, in seconds, at which a connection attempt should be made after a socket has been closed. Multiple intervals can be specified as a comma-separated list of numbers. Set to 0 to disable."
+          }
+        }
       }
     }
   }
