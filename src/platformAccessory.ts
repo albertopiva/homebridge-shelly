@@ -76,6 +76,10 @@ export class ShellyPlatformAccessory {
       .onSet(this.setOn.bind(this)) // SET - bind to the `setOn` method below
       .onGet(this.getOn.bind(this)); // GET - bind to the `getOn` method below
 
+    this.platform.log.info('test:');
+    this.platform.log.info(shellyDevice.network_id);
+    this.platform.log.info(JSON.stringify(shellyDevice));
+
     // websocket connection
     this.shellyDeviceState.ws = new WebSocket(
       `ws://${shellyDevice.network_id}/rpc`,
