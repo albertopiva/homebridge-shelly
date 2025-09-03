@@ -35,7 +35,7 @@
               "type": "boolean",
               "default": false
             },
-            "hostname": {
+            "network_id": {
               "title": "IP address or hostname",
               "description": "Set this value if your device can't be discovered automatically.",
               "type": "string",
