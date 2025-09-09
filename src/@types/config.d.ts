@@ -1,13 +1,22 @@
 import { PlatformConfig } from 'homebridge';
 
 export interface DeviceConfig {
+  /**
+   * Device identifier
+   */
   id: string;
   name?: string;
   /**
    * IP or hostname
    */
   network_id: string;
+  /**
+   * Device password, if any
+   */
   password?: string;
+  /**
+   * Exclude this device from being controlled by Homebridge
+   */
   exclude?: boolean;
 }
 

@@ -1,3 +1,5 @@
+import { JSONRPCRequest } from 'json-rpc-2.0';
+
 /**
  * RequestFrame represents a JSON-RPC request frame.
  * jsonrpc: 2.0. The version of jsonrpc used.
@@ -6,10 +8,6 @@
  * method: Name of the procedure to be called.
  * params: Parameters that the method takes (if any).
  */
-export type RequestFrame = {
-  jsonrpc?: string;
-  id: number | string;
+export interface ShellyRPCRequest extends JSONRPCRequest {
   src: string;
-  method: string;
-  params?: object;
-};
+}

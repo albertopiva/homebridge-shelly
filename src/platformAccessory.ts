@@ -5,9 +5,9 @@ import type {
 } from 'homebridge';
 
 import type { ShellyPlatform } from './platform.js';
-import WebSocket from 'ws';
 import { DeviceConfig } from './@types/config.js';
 import { ShellyAccessoryState } from './@types/Accesory.js';
+import { RPCWebSocket } from './services/rpc/ws.js';
 
 /**
  * Platform Accessory
@@ -80,52 +80,15 @@ export class ShellyPlatformAccessory {
     this.platform.log.info(shellyDevice.network_id);
     this.platform.log.info(JSON.stringify(shellyDevice));
 
-    // websocket connection
-    this.shellyDeviceState.ws = new WebSocket(
-      `ws://${shellyDevice.network_id}/rpc`,
+    this.shellyDeviceState.ws = new RPCWebSocket(
+      shellyDevice.network_id,
+      this.platform.log,
     );
 
-    this.shellyDeviceState.ws?.on('open', () => {
-      this.platform.log.info(
-        `[Shelly WS] Connesso a ${shellyDevice.network_id}`,
-      );
-      // Richiesta iniziale di stato (esempio per switch:0)
-      const req = {
-        id: 1,
-        method: 'Switch.GetStatus',
-        params: { id: 0 },
-        src: 'hb-bridge',
-      };
-      this.shellyDeviceState.ws?.send(JSON.stringify(req));
-      this.platform.log.info('[Shelly WS] Richiesta stato inviata:', req);
-    });
-    this.shellyDeviceState.ws?.on('message', (msg: string) => {
-      try {
-        const data = JSON.parse(msg);
-        if (data.method === 'NotifyStatus') {
-          this.platform.log.info(
-            '[Shelly WS] Stato aggiornato:',
-            JSON.stringify(data.params, null, 2),
-          );
-        } else {
-          this.platform.log.info('[Shelly WS] Evento RPC:', data);
-        }
-      } catch (e) {
-        this.platform.log.error(
-          '[Shelly WS] Errore parsing messaggio:',
-          e,
-          msg,
-        );
-      }
-    });
-
-    this.shellyDeviceState.ws?.on('error', (err: Error) => {
-      this.platform.log.error('[Shelly WS] Errore WS:', err.message);
-    });
-
-    this.shellyDeviceState.ws?.on('close', () => {
-      this.platform.log.warn('[Shelly WS] Connessione chiusa.');
-    });
+    this.shellyDeviceState.ws.open('Switch.GetStatus', { id: 0 });
+    this.shellyDeviceState.ws.message();
+    this.shellyDeviceState.ws.error();
+    this.shellyDeviceState.ws.close();
   }
 
   /**
@@ -135,6 +98,15 @@ export class ShellyPlatformAccessory {
   async setOn(value: CharacteristicValue) {
     // implement your own code to turn your device on/off
     this.shellyDeviceState.On = value as boolean;
+
+    // this.shellyDeviceState.ws?.send(
+    //   JSON.stringify({
+    //     id: 2,
+    //     method: 'Switch.Toggle',
+    //     params: { id: 0 },
+    //     src: 'hb-bridge',
+    //   }),
+    // );
 
     this.platform.log.debug('Set Characteristic On ->', value);
   }

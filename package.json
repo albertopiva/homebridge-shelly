@@ -29,11 +29,12 @@
     "lint": "eslint . --max-warnings=0",
     "prepublishOnly": "npm run lint && npm run build",
     "watch": "npm run build && npm link && nodemon",
-    "test": "node src/script.mjs"
+    "test": "node scripts/test_2.mjs"
   },
   "dependencies": {
     "homebridge-lib": "^7.1.4",
     "json-rpc-2.0": "^1.7.1",
+    "node-fetch": "^3.3.2",
     "ws": "^8.18.3"
   },
   "devDependencies": {

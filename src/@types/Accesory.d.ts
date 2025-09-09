@@ -1,6 +1,6 @@
-import { WebSocket } from 'ws';
+import { RPCWebSocket } from '../services/rpc/ws';
 
 export interface ShellyAccessoryState {
   On: boolean;
-  ws: WebSocket | null;
+  ws: RPCWebSocket | null;
 }
