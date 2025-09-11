@@ -7,7 +7,7 @@ import {
   ShellyRPCNotificationFrame,
   ShellyRPCResponse,
 } from '../../@types/rpc/response';
-import { Logger } from '../logger/logger';
+// import { Logger } from '../logger/logger';
 
 export class RPCWebSocket {
   readonly LogMessage = '[RPC WS]';
@@ -15,14 +15,14 @@ export class RPCWebSocket {
   private conn: WebSocket;
   private address: string | URL;
   private id: number;
-  private logger: Logger;
+  private logger;
 
   constructor(address: string | URL, logger?: Logging) {
     this.conn = new WebSocket(address);
     this.address = address;
     this.id = 0;
-    this.logger = new Logger(logger, '[RPC WS]');
-    this.logger.debug(`WebSocket initialized to address ${this.address}`);
+    this.logger = logger; //new Logger(logger, '[RPC WS]');
+    this.logger?.debug(`WebSocket initialized to address ${this.address}`);
   }
 
   public open(method: string, params: object, src?: string) {
@@ -45,15 +45,15 @@ export class RPCWebSocket {
     this.conn.on('message', (msg: string) => {
       try {
         const data = JSON.parse(msg);
-        this.logger.info('Message:', msg);
+        this.logger?.info('Message:', msg);
         callback?.(data);
         if (data.method === 'NotifyStatus') {
-          this.logger.info('NotifyStatus:', msg);
+          this.logger?.info('NotifyStatus:', msg);
         } else {
-          this.logger.info('Evento RPC:', data);
+          this.logger?.info('Evento RPC:', data);
         }
       } catch (e) {
-        this.logger.error('Errore parsing messaggio:', e, msg);
+        this.logger?.error('Errore parsing messaggio:', e, msg);
       }
     });
   }
@@ -61,14 +61,14 @@ export class RPCWebSocket {
   public error(callback?: (error: ShellyRPCErrorResponse) => void) {
     this.conn.on('error', (error: ShellyRPCErrorResponse) => {
       callback?.(error);
-      this.logger.error(JSON.stringify(error));
+      this.logger?.error(JSON.stringify(error));
     });
   }
 
   public close(callback?: () => void) {
     this.conn.on('close', () => {
       callback?.();
-      this.logger.warn('WebSocket closed');
+      this.logger?.warn('WebSocket closed');
     });
   }
 
@@ -76,6 +76,6 @@ export class RPCWebSocket {
     this.id++;
     const req = JSON.stringify(request);
     this.conn.send(req);
-    this.logger.debug('Request sent:', req);
+    this.logger?.debug('Request sent:', req);
   }
 }
