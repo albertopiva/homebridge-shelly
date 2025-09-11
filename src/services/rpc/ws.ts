@@ -42,26 +42,27 @@ export class RPCWebSocket {
   public message(
     callback?: (msg: ShellyRPCResponse | ShellyRPCNotificationFrame) => void,
   ) {
-    this.conn.on('message', (msg: string) => {
+    this.conn.on('message', (msg: Buffer) => {
       try {
-        const data = JSON.parse(msg);
-        this.logger?.info('Message:', msg);
+        const data = JSON.parse(msg.toString());
+        this.logger?.info('Message:', msg.toString());
         callback?.(data);
         if (data.method === 'NotifyStatus') {
-          this.logger?.info('NotifyStatus:', msg);
+          this.logger?.info('NotifyStatus:', msg.toString());
         } else {
           this.logger?.info('Evento RPC:', data);
         }
       } catch (e) {
-        this.logger?.error('Errore parsing messaggio:', e, msg);
+        this.logger?.error('Errore parsing messaggio:', e, msg.toString());
       }
     });
   }
 
   public error(callback?: (error: ShellyRPCErrorResponse) => void) {
-    this.conn.on('error', (error: ShellyRPCErrorResponse) => {
-      callback?.(error);
-      this.logger?.error(JSON.stringify(error));
+    this.conn.on('error', (error: Buffer) => {
+      const parsedError: ShellyRPCErrorResponse = JSON.parse(error.toString());
+      callback?.(parsedError);
+      this.logger?.error(JSON.stringify(parsedError));
     });
   }
 
