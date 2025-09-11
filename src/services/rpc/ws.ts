@@ -18,7 +18,7 @@ export class RPCWebSocket {
   private logger;
 
   constructor(address: string | URL, logger?: Logging) {
-    this.conn = new WebSocket(`ws://${address}`);
+    this.conn = new WebSocket(`ws://${address}/rpc`);
     this.address = address;
     this.id = 0;
     this.logger = logger; //new Logger(logger, '[RPC WS]');
