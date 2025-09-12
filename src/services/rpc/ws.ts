@@ -7,7 +7,7 @@ import {
   ShellyRPCNotificationFrame,
   ShellyRPCResponse,
 } from '../../@types/rpc/response';
-import { Logger } from '../logger';
+import { Logger } from '../logger/index.js';
 
 export class RPCWebSocket {
   readonly LogMessage = '[RPC WS]';
