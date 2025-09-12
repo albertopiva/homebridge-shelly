@@ -5,7 +5,7 @@ import { Logging } from 'homebridge';
 import {
   ShellyRPCErrorResponse,
   ShellyRPCNotificationFrame,
-  ShellyRPCResponse,
+  ShellyRPCSuccessResponse,
 } from '../../@types/rpc/response';
 import { Logger } from '../logger/index.js';
 
@@ -16,16 +16,18 @@ export class RPCWebSocket {
   private address: string | URL;
   private id: number;
   private logger;
+  private src: string;
 
-  constructor(address: string | URL, logger?: Logging) {
+  constructor(address: string | URL, logger?: Logging, src?: string) {
     this.conn = new WebSocket(`ws://${address}/rpc`);
     this.address = address;
     this.id = 0;
+    this.src = src || 'hb-bridge';
     this.logger = new Logger(logger, '[RPC WS]');
     this.logger?.debug(`WebSocket initialized to address ${this.address}`);
   }
 
-  public open(method: string, params: object, src?: string) {
+  public open(method: string, params: object) {
     this.conn.on('open', () => {
       // Initial state request (example for switch:0)
       const req: ShellyRPCRequest = {
@@ -33,24 +35,38 @@ export class RPCWebSocket {
         id: this.id,
         method: method,
         params: params,
-        src: src || 'hb-bridge',
+        src: this.src,
       };
       this.sendRequest(req);
     });
   }
 
   public message(
-    callback?: (msg: ShellyRPCResponse | ShellyRPCNotificationFrame) => void,
+    callback?: (
+      msg: ShellyRPCSuccessResponse | ShellyRPCNotificationFrame,
+    ) => void,
   ) {
     this.conn.on('message', (msg: Buffer) => {
       try {
         const data = JSON.parse(msg.toString());
         this.logger?.info('Message:', msg.toString());
         callback?.(data);
-        if (data.method === 'NotifyStatus') {
-          this.logger?.info('NotifyStatus:', msg.toString());
+        if (data.id) {
+          const data: ShellyRPCSuccessResponse = JSON.parse(
+            msg.toString(),
+          ) as unknown as ShellyRPCSuccessResponse;
+          this.id = Number(data?.id || 0) + 1;
         } else {
-          this.logger?.info('Evento RPC:', data);
+          switch (data.method) {
+            case 'NotifyStatus':
+              this.logger?.info('NotifyStatus:', msg.toString());
+              break;
+            case 'NotifyEvent':
+              // Handle other methods if needed
+              break;
+            default:
+              this.logger?.warn('Evento RPC:', data);
+          }
         }
       } catch (e) {
         this.logger?.error('Errore parsing messaggio:', e, msg.toString());
@@ -71,6 +87,17 @@ export class RPCWebSocket {
       callback?.();
       this.logger?.warn('WebSocket closed');
     });
+  }
+
+  public send(method: string, params: object) {
+    const req: ShellyRPCRequest = {
+      id: this.id,
+      jsonrpc: JSONRPC,
+      method: method,
+      params: params,
+      src: this.src,
+    };
+    this.sendRequest(req);
   }
 
   private sendRequest(request: ShellyRPCRequest) {

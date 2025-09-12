@@ -12,18 +12,18 @@ export class Logger {
   }
 
   public debug(message: string, ...args: unknown[]) {
-    this.logger?.debug(`${this.msgPrefix}[DEBUG] ${message}`, ...args);
+    this.logger?.debug(`${this.msgPrefix} ${message}`, ...args);
   }
 
   public info(message: string, ...args: unknown[]) {
-    this.logger?.info(`${this.msgPrefix}[INFO] ${message}`, ...args);
+    this.logger?.info(`${this.msgPrefix} ${message}`, ...args);
   }
 
   public warn(message: string, ...args: unknown[]) {
-    this.logger?.warn(`${this.msgPrefix}[WARN] ${message}`, ...args);
+    this.logger?.warn(`${this.msgPrefix} ${message}`, ...args);
   }
 
   public error(message: string, ...args: unknown[]) {
-    this.logger?.error(`${this.msgPrefix}[ERROR] ${message}`, ...args);
+    this.logger?.error(`${this.msgPrefix} ${message}`, ...args);
   }
 }

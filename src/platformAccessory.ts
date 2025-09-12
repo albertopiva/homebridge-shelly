@@ -8,6 +8,7 @@ import type { ShellyPlatform } from './platform.js';
 import { DeviceConfig } from './@types/config.js';
 import { ShellyAccessoryState } from './@types/Accesory.js';
 import { RPCWebSocket } from './services/rpc/ws.js';
+import { Logger } from './services/logger/logger.js';
 
 /**
  * Platform Accessory
@@ -16,6 +17,7 @@ import { RPCWebSocket } from './services/rpc/ws.js';
  */
 export class ShellyPlatformAccessory {
   private service: Service;
+  private logger: Logger;
 
   /**
    * These are just used to create a working example
@@ -31,6 +33,7 @@ export class ShellyPlatformAccessory {
     private readonly accessory: PlatformAccessory,
   ) {
     const shellyDevice: DeviceConfig = accessory.context.device;
+    this.logger = new Logger(this.platform.log, `[${shellyDevice.name}]`);
     // set accessory information
     this.accessory
       .getService(this.platform.Service.AccessoryInformation)!
@@ -76,10 +79,6 @@ export class ShellyPlatformAccessory {
       .onSet(this.setOn.bind(this)) // SET - bind to the `setOn` method below
       .onGet(this.getOn.bind(this)); // GET - bind to the `getOn` method below
 
-    this.platform.log.info('test:');
-    this.platform.log.info(shellyDevice.network_id);
-    this.platform.log.info(JSON.stringify(shellyDevice));
-
     this.shellyDeviceState.ws = new RPCWebSocket(
       shellyDevice.network_id,
       this.platform.log,
@@ -96,8 +95,11 @@ export class ShellyPlatformAccessory {
    * These are sent when the user changes the state of an accessory, for example, turning on a Light bulb.
    */
   async setOn(value: CharacteristicValue) {
+    this.logger.debug('Set Characteristic On ->', value);
     // implement your own code to turn your device on/off
     this.shellyDeviceState.On = value as boolean;
+
+    this.shellyDeviceState.ws?.send('Switch.Toggle', { id: 0 });
 
     // this.shellyDeviceState.ws?.send(
     //   JSON.stringify({
