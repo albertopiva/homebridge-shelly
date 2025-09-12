@@ -7,7 +7,7 @@ import {
   ShellyRPCNotificationFrame,
   ShellyRPCResponse,
 } from '../../@types/rpc/response';
-// import { Logger } from '../logger/logger';
+import { Logger } from '../logger/logger';
 
 export class RPCWebSocket {
   readonly LogMessage = '[RPC WS]';
@@ -21,7 +21,7 @@ export class RPCWebSocket {
     this.conn = new WebSocket(`ws://${address}/rpc`);
     this.address = address;
     this.id = 0;
-    this.logger = logger; //new Logger(logger, '[RPC WS]');
+    this.logger = new Logger(logger, '[RPC WS]');
     this.logger?.debug(`WebSocket initialized to address ${this.address}`);
   }
 
