@@ -29,9 +29,9 @@ export class SmartPlug extends Device {
     // setOn,
   }: DeviceConstructor) {
     super({ accessory, platform, deviceInfo, logger });
-    if (!this.allowedModels.includes(deviceInfo.model)) {
-      throw new Error(`Unsupported model: ${deviceInfo.model}`);
-    }
+    // if (!this.allowedModels.includes(deviceInfo.model)) {
+    //   throw new Error(`Unsupported model: ${deviceInfo.model}`);
+    // }
 
     this.switchService =
       this.accessory.getService(this.platform.Service.Switch) ||
