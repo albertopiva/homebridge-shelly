@@ -1,6 +1,6 @@
 import { Logging, PlatformAccessory } from 'homebridge';
 import { DeviceInfo } from '../@types/shelly';
-import { Logger } from '../services/logger';
+import { Logger } from '../services/logger/index.js';
 import { ShellyPlatform } from '../platform';
 
 export interface DeviceConstructor {
