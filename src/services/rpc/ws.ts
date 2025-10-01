@@ -27,7 +27,7 @@ export class RPCWebSocket {
     this.logger?.debug(`WebSocket initialized to address ${this.address}`);
   }
 
-  public open(method: string, params: object) {
+  public open(method: string, params?: object) {
     this.conn.on('open', () => {
       // Initial state request (example for switch:0)
       const req: ShellyRPCRequest = {
@@ -48,24 +48,24 @@ export class RPCWebSocket {
   ) {
     this.conn.on('message', (msg: Buffer) => {
       try {
-        const data = JSON.parse(msg.toString());
-        this.logger?.info('Message:', msg.toString());
+        const data: ShellyRPCSuccessResponse | ShellyRPCNotificationFrame =
+          JSON.parse(msg.toString());
+        // this.logger?.info('Message:', msg.toString());
         callback?.(data);
-        if (data.id) {
-          const data: ShellyRPCSuccessResponse = JSON.parse(
-            msg.toString(),
-          ) as unknown as ShellyRPCSuccessResponse;
+        if ('id' in data) {
           this.id = Number(data?.id || 0) + 1;
+          this.logger?.info('ResponseFrame:', msg.toString());
         } else {
           switch (data.method) {
             case 'NotifyStatus':
               this.logger?.info('NotifyStatus:', msg.toString());
               break;
             case 'NotifyEvent':
-              // Handle other methods if needed
+              this.logger?.info('NotifyEvent:', msg.toString());
+
               break;
             default:
-              this.logger?.warn('Evento RPC:', data);
+              this.logger?.warn('Evento RPC not handled:', data.method);
           }
         }
       } catch (e) {
