@@ -3,7 +3,7 @@ import type { PlatformAccessory } from 'homebridge';
 import type { ShellyPlatform } from './platform.js';
 import { DeviceConfig } from './@types/config.js';
 import { Logger } from './services/logger/logger.js';
-import { ShellyModels } from './enums/index.js';
+import { ShellyModels } from './enums/shelly.js';
 import { DeviceInfo } from './@types/shelly.js';
 import { SmartPlug } from './devices/smartPlug.js';
 
