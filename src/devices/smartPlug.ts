@@ -1,8 +1,8 @@
 import { CharacteristicValue, Service } from 'homebridge';
-import { ShellyModelCode } from '../@types/shelly';
-import { ShellyModels } from '../enums/shelly';
-import { Device, DeviceConstructor } from './base';
-import { RPCWebSocket } from '../services/rpc/ws';
+import { ShellyModelCode } from '../@types/shelly.js';
+import { ShellyModels } from '../enums/shelly.js';
+import { Device, DeviceConstructor } from './base.js';
+import { RPCWebSocket } from '../services/rpc/ws.js';
 
 // interface SmartPlugConstructor extends DeviceConstructor {
 //   // getOn: () => Promise<CharacteristicValue>;
