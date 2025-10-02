@@ -82,7 +82,7 @@ export class ShellyPlatformAccessory {
     // implement your own code to check if the device is on
     // const isOn = this.switch0_active;
 
-    this.platform.log.debug('EXTERNAL: Get Characteristic On ->', isOn);
+    this.platform.log.debug('EXTERNAL: Get Characteristic On ->', true);
 
     // if you need to return an error to show the device as "Not Responding" in the Home app:
     // if (isOn instanceof Error) {
