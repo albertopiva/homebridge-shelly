@@ -23,7 +23,7 @@ export class Device {
   constructor({ platform, accessory, deviceInfo, logger }: DeviceConstructor) {
     this.platform = platform;
     this.accessory = accessory;
-    this.logger = new Logger(logger, `[${accessory.context.name}]`);
+    this.logger = new Logger(logger, `[${accessory.context.device.name}]`);
     this.deviceInfo = deviceInfo;
 
     this.initBaseCharacteristics();
