@@ -50,18 +50,17 @@ export class RPCWebSocket {
       try {
         const data: ShellyRPCSuccessResponse | ShellyRPCNotificationFrame =
           JSON.parse(msg.toString());
-        // this.logger?.info('Message:', msg.toString());
         callback?.(data);
         if ('id' in data) {
           this.id = Number(data?.id || 0) + 1;
-          this.logger?.info('ResponseFrame:', msg.toString());
+          this.logger?.debug('ResponseFrame:', msg.toString());
         } else {
           switch (data.method) {
             case 'NotifyStatus':
-              this.logger?.info('NotifyStatus:', msg.toString());
+              this.logger?.debug('NotifyStatus:', msg.toString());
               break;
             case 'NotifyEvent':
-              this.logger?.info('NotifyEvent:', msg.toString());
+              this.logger?.debug('NotifyEvent:', msg.toString());
 
               break;
             default:
@@ -90,14 +89,19 @@ export class RPCWebSocket {
   }
 
   public send(method: string, params: object) {
-    const req: ShellyRPCRequest = {
-      id: this.id,
-      jsonrpc: JSONRPC,
-      method: method,
-      params: params,
-      src: this.src,
-    };
-    this.sendRequest(req);
+    try {
+      const req: ShellyRPCRequest = {
+        id: this.id,
+        jsonrpc: JSONRPC,
+        method: method,
+        params: params,
+        src: this.src,
+      };
+      this.sendRequest(req);
+      this.logger?.debug(`Request sent: ${JSON.stringify(req)}`);
+    } catch (e) {
+      this.logger?.error('Error sending request:', e);
+    }
   }
 
   private sendRequest(request: ShellyRPCRequest) {
