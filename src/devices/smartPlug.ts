@@ -4,31 +4,24 @@ import { ShellyModels } from '../enums/shelly.js';
 import { Device, DeviceConstructor } from './base.js';
 import { RPCWebSocket } from '../services/rpc/ws.js';
 
-// interface SmartPlugConstructor extends DeviceConstructor {
-//   // getOn: () => Promise<CharacteristicValue>;
-//   // setOn: (value: CharacteristicValue) => Promise<void>;
-// }
-
 export class SmartPlug extends Device {
   readonly allowedModels: ShellyModelCode[] = [
     ShellyModels.PlusPlugEU,
     ShellyModels.PlusPlugUS,
     ShellyModels.PlusPlugUS,
   ];
+  // device services
   switchService: Service;
+  // Device WebSocket connection
   ws: RPCWebSocket | null = null;
-
+  // device state
   switch0_active: boolean = false;
 
-  constructor({
-    accessory,
-    platform,
-    deviceInfo,
-    logger,
-    // getOn,
-    // setOn,
-  }: DeviceConstructor) {
+  constructor({ accessory, platform, deviceInfo, logger }: DeviceConstructor) {
     super({ accessory, platform, deviceInfo, logger });
+
+    this.logger.info(`Initializing SmartPlug device`);
+
     // if (!this.allowedModels.includes(deviceInfo.model)) {
     //   throw new Error(`Unsupported model: ${deviceInfo.model}`);
     // }
@@ -53,6 +46,7 @@ export class SmartPlug extends Device {
       .onSet(this.setOn.bind(this)) // SET - bind to the `setOn` method below
       .onGet(this.getOn.bind(this)); // GET - bind to the `getOn` method below
 
+    this.logger.info('SmartPlug handlers registered successfully');
     this.initWebSocket();
   }
 
@@ -62,10 +56,32 @@ export class SmartPlug extends Device {
       this.platform.log,
     );
 
-    this.ws.open('Switch.GetDeviceInfo', { id: 0 });
-    this.ws.message();
+    this.ws.open('Switch.GetStatus', { id: 0 });
+    this.ws.message(this.handleMessage.bind(this));
     this.ws.error();
     this.ws.close();
+  }
+
+  handleMessage(message: any) {
+    if (this.deviceInfo.id !== message.src) {
+      this.logger.warn(
+        `Message received from different device: ${message.src}, ignoring it.`,
+      );
+      return;
+    }
+    // responseFrame
+    if ('result' in message && 'output' in message.result) {
+      this.updateSwitchState(message.result.output);
+    }
+
+    // notificationFrame
+    if (
+      'params' in message &&
+      'switch:0' in message.params &&
+      'output' in message.params['switch:0']
+    ) {
+      this.updateSwitchState(message.params['switch:0'].output);
+    }
   }
 
   updateSwitchState(on: boolean) {
@@ -80,13 +96,11 @@ export class SmartPlug extends Device {
    * These are sent when the user changes the state of an accessory, for example, turning on a Light bulb.
    */
   async setOn(value: CharacteristicValue) {
-    this.logger.debug('Set Characteristic On ->', value);
+    this.logger.debug('HomeKit requested setOn:', value);
+
     // implement your own code to turn your device on/off
     this.switch0_active = value as boolean;
-
-    // this.shellyDeviceState.ws?.send('Switch.Toggle', { id: 0 });
-
-    this.platform.log.debug('Set Characteristic On ->', value);
+    this.ws?.send('Switch.Set', { id: 0, on: value });
   }
 
   /**
@@ -105,18 +119,15 @@ export class SmartPlug extends Device {
    * this.service.updateCharacteristic(this.platform.Characteristic.On, true)
    */
   async getOn(): Promise<CharacteristicValue> {
-    // implement your own code to check if the device is on
-    const isOn = this.switch0_active;
-
-    this.platform.log.debug('Get Characteristic On ->', isOn);
+    this.logger.debug('HomeKit request Get On ->', this.switch0_active);
 
     // if you need to return an error to show the device as "Not Responding" in the Home app:
-    // if (isOn instanceof Error) {
+    // if (this.switch0_active instanceof Error) {
     //   throw new this.platform.api.hap.HapStatusError(
     //     this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE,
     //   );
     // }
 
-    return isOn;
+    return this.switch0_active;
   }
 }
