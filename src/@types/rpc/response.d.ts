@@ -33,5 +33,5 @@ export interface ShellyRPCNotificationFrame {
   src: string;
   dst: string;
   method: string;
-  params: object;
+  params: Record<string, object>;
 }

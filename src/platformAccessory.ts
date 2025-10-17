@@ -1,4 +1,4 @@
-import type { CharacteristicValue, PlatformAccessory } from 'homebridge';
+import type {  PlatformAccessory } from 'homebridge';
 
 import type { ShellyPlatform } from './platform.js';
 import { DeviceConfig } from './@types/config.js';

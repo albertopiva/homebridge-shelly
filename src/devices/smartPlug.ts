@@ -3,6 +3,7 @@ import { ShellyModelCode } from '../@types/shelly.js';
 import { ShellyModels } from '../enums/shelly.js';
 import { Device, DeviceConstructor } from './base.js';
 import { RPCWebSocket } from '../services/rpc/ws.js';
+import { ShellyRPCNotificationFrame, ShellyRPCSuccessResponse } from '../@types/rpc/response.js';
 
 export class SmartPlug extends Device {
   readonly allowedModels: ShellyModelCode[] = [
@@ -20,7 +21,7 @@ export class SmartPlug extends Device {
   constructor({ accessory, platform, deviceInfo, logger }: DeviceConstructor) {
     super({ accessory, platform, deviceInfo, logger });
 
-    this.logger.info(`Initializing SmartPlug device`);
+    this.logger.info('Initializing SmartPlug device');
 
     // if (!this.allowedModels.includes(deviceInfo.model)) {
     //   throw new Error(`Unsupported model: ${deviceInfo.model}`);
@@ -62,16 +63,17 @@ export class SmartPlug extends Device {
     this.ws.close();
   }
 
-  handleMessage(message: any) {
-    if (this.deviceInfo.id !== message.src) {
+  handleMessage(message: ShellyRPCSuccessResponse | ShellyRPCNotificationFrame) {
+    if ('src' in message && this.deviceInfo.id !== message.src) {
       this.logger.warn(
         `Message received from different device: ${message.src}, ignoring it.`,
       );
       return;
     }
+    let newValue: boolean | null = null;
     // responseFrame
     if ('result' in message && 'output' in message.result) {
-      this.updateSwitchState(message.result.output);
+      newValue = message.result.output;
     }
 
     // notificationFrame
@@ -80,7 +82,11 @@ export class SmartPlug extends Device {
       'switch:0' in message.params &&
       'output' in message.params['switch:0']
     ) {
-      this.updateSwitchState(message.params['switch:0'].output);
+      newValue = message.params['switch:0'].output as boolean;
+    }
+
+    if (newValue !== null) {
+      this.updateSwitchState(newValue);
     }
   }
 
