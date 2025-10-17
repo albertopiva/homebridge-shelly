@@ -1,0 +1,200 @@
+{
+  "pluginAlias": "Shelly",
+  "pluginType": "platform",
+  "singular": true,
+  "strictValidation": false,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "required": true,
+        "default": "Shelly"
+      },
+      "devices": {
+        "type": "array",
+        "items": {
+          "title": "Device",
+          "type": "object",
+          "properties": {
+            "id": {
+              "title": "Device ID",
+              "description": "See <a href='https://github.com/alexryd/homebridge-shelly-ng/wiki/Finding-a-device-ID' target='_blank'>this page</a> for instructions on how to find your device's ID.",
+              "type": "string",
+              "placeholder": "e.g. shellyplus1-abcdef123456",
+              "required": true
+            },
+            "name": {
+              "title": "Name",
+              "description": "This name will be shown in the homebridge log and will be used as the default name when the device is added to HomeKit. Note though that setting this value after the device has been added will not change the name in HomeKit.",
+              "type": "string"
+            },
+            "exclude": {
+              "title": "Exclude this device",
+              "type": "boolean",
+              "default": false
+            },
+            "hostname": {
+              "title": "IP address or hostname",
+              "description": "Set this value if your device can't be discovered automatically.",
+              "type": "string",
+              "placeholder": "e.g. 192.168.1.100"
+            },
+            "password": {
+              "title": "Password",
+              "type": "string",
+              "description": "The password to use if the Shelly device requires authentication."
+            },
+            "switch:0": {
+              "title": "Switch 1",
+              "type": "object",
+              "properties": {
+                "exclude": {
+                  "title": "Exclude this switch",
+                  "type": "boolean",
+                  "default": false
+                },
+                "type": {
+                  "title": "Type",
+                  "description": "The type of accessory used to represent the switch.",
+                  "type": "string",
+                  "oneOf": [
+                    { "title": "Outlet", "enum": ["outlet"] },
+                    { "title": "Switch", "enum": ["switch"] }
+                  ],
+                  "default": "switch"
+                }
+              }
+            },
+            "switch:1": {
+              "title": "Switch 2",
+              "type": "object",
+              "properties": {
+                "exclude": {
+                  "title": "Exclude this switch",
+                  "type": "boolean",
+                  "default": false
+                },
+                "type": {
+                  "title": "Type",
+                  "description": "The type of accessory used to represent the switch.",
+                  "type": "string",
+                  "oneOf": [
+                    { "title": "Outlet", "enum": ["outlet"] },
+                    { "title": "Switch", "enum": ["switch"] }
+                  ],
+                  "default": "switch"
+                }
+              }
+            },
+            "switch:2": {
+              "title": "Switch 3",
+              "type": "object",
+              "properties": {
+                "exclude": {
+                  "title": "Exclude this switch",
+                  "type": "boolean",
+                  "default": false
+                },
+                "type": {
+                  "title": "Type",
+                  "description": "The type of accessory used to represent the switch.",
+                  "type": "string",
+                  "oneOf": [
+                    { "title": "Outlet", "enum": ["outlet"] },
+                    { "title": "Switch", "enum": ["switch"] }
+                  ],
+                  "default": "switch"
+                }
+              }
+            },
+            "switch:3": {
+              "title": "Switch 4",
+              "type": "object",
+              "properties": {
+                "exclude": {
+                  "title": "Exclude this switch",
+                  "type": "boolean",
+                  "default": false
+                },
+                "type": {
+                  "title": "Type",
+                  "description": "The type of accessory used to represent the switch.",
+                  "type": "string",
+                  "oneOf": [
+                    { "title": "Outlet", "enum": ["outlet"] },
+                    { "title": "Switch", "enum": ["switch"] }
+                  ],
+                  "default": "switch"
+                }
+              }
+            },
+            "cover:0": {
+              "title": "Cover",
+              "type": "object",
+              "properties": {
+                "exclude": {
+                  "title": "Exclude this cover",
+                  "type": "boolean",
+                  "default": false
+                },
+                "type": {
+                  "title": "Type",
+                  "description": "The type of accessory used to represent the cover. This setting apply only when the device is in cover mode.",
+                  "type": "string",
+                  "oneOf": [
+                    { "title": "Door", "enum": ["door"] },
+                    { "title": "Window", "enum": ["window"] },
+                    { "title": "Window Covering", "enum": ["windowCovering"] }
+                  ],
+                  "default": "window"
+                }
+              }
+            }
+          }
+        }
+      },
+      "mdns": {
+        "type": "object",
+        "properties": {
+          "enable": {
+            "title": "Enable",
+            "description": "Whether devices should be automatically discovered using mDNS.",
+            "type": "boolean",
+            "default": true
+          },
+          "interface": {
+            "title": "Network interface",
+            "description": "The network interface to use when sending and receiving mDNS packets. You probably don't need to use this setting unless you know what you're doing. If not specified, all available network interfaces will be used.",
+            "type": "string",
+            "placeholder": "e.g. eth0 or 192.168.1.100"
+          }
+        }
+      },
+      "websocket": {
+        "type": "object",
+        "properties": {
+          "requestTimeout": {
+            "title": "Request timeout",
+            "type": "integer",
+            "placeholder": "10",
+            "description": "The time, in seconds, to wait for a response before a request is aborted."
+          },
+          "pingInterval": {
+            "title": "Ping interval",
+            "type": "integer",
+            "placeholder": "60",
+            "description": "The interval, in seconds, at which ping requests should be made to verify that the connection is open. Set to 0 to disable."
+          },
+          "reconnectInterval": {
+            "title": "Reconnect intervals",
+            "type": "string",
+            "placeholder": "5,10,30,60,300,600",
+            "description": "The interval, in seconds, at which a connection attempt should be made after a socket has been closed. Multiple intervals can be specified as a comma-separated list of numbers. Set to 0 to disable."
+          }
+        }
+      }
+    }
+  }
+}

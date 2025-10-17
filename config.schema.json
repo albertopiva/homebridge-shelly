@@ -1,5 +1,5 @@
 {
-  "pluginAlias": "ExampleHomebridgePlugin",
+  "pluginAlias": "Homebridge Shelly",
   "pluginType": "platform",
   "singular": true,
   "strictValidation": false,
@@ -10,7 +10,44 @@
         "title": "Name",
         "type": "string",
         "required": true,
-        "default": "Example Dynamic Platform"
+        "default": "Shelly"
+      },
+      "devices": {
+        "type": "array",
+        "items": {
+          "title": "Device",
+          "type": "object",
+          "properties": {
+            "id": {
+              "title": "Device ID",
+              "description": "See <a href='https://github.com/alexryd/homebridge-shelly-ng/wiki/Finding-a-device-ID' target='_blank'>this page</a> for instructions on how to find your device's ID.",
+              "type": "string",
+              "placeholder": "e.g. shellyplus1-abcdef123456",
+              "required": true
+            },
+            "name": {
+              "title": "Name",
+              "description": "This name will be shown in the homebridge log and will be used as the default name when the device is added to HomeKit. Note though that setting this value after the device has been added will not change the name in HomeKit.",
+              "type": "string"
+            },
+            "exclude": {
+              "title": "Exclude this device",
+              "type": "boolean",
+              "default": false
+            },
+            "network_id": {
+              "title": "IP address or hostname",
+              "description": "Set this value if your device can't be discovered automatically.",
+              "type": "string",
+              "placeholder": "e.g. 192.168.1.100"
+            },
+            "password": {
+              "title": "Password",
+              "type": "string",
+              "description": "The password to use if the Shelly device requires authentication."
+            }
+          }
+        }
       }
     }
   }
