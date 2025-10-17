@@ -91,8 +91,12 @@ export class SmartPlug extends Device {
   }
 
   updateSwitchState(on: boolean) {
-    this.logger.info('External state change ->', on);
+    // no update needed if the value is the actual one
+    if (this.switch0_active === on) {
+      return;
+    }
 
+    this.logger.info('External state change ->', on);
     this.switch0_active = on;
     this.switchService
       .getCharacteristic(this.platform.Characteristic.On)
@@ -104,6 +108,11 @@ export class SmartPlug extends Device {
    * These are sent when the user changes the state of an accessory, for example, turning on a Light bulb.
    */
   async setOn(value: CharacteristicValue) {
+    // no update needed if the value is the actual one
+    if (this.switch0_active === (value as boolean)) {
+      return;
+    }
+
     this.logger.info('HomeKit state state:', value);
     // implement your own code to turn your device on/off
     this.switch0_active = value as boolean;
