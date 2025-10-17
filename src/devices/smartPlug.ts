@@ -113,7 +113,7 @@ export class SmartPlug extends Device {
       return;
     }
 
-    this.logger.info('HomeKit state state:', value);
+    this.logger.info('HomeKit set state:', value);
     // implement your own code to turn your device on/off
     this.switch0_active = value as boolean;
     this.ws?.send('Switch.Set', { id: 0, on: value });
@@ -135,7 +135,7 @@ export class SmartPlug extends Device {
    * this.service.updateCharacteristic(this.platform.Characteristic.On, true)
    */
   async getOn(): Promise<CharacteristicValue> {
-    this.logger.info('HomeKit request state ->', this.switch0_active);
+    this.logger.info('HomeKit get state ->', this.switch0_active);
 
     // if you need to return an error to show the device as "Not Responding" in the Home app:
     // if (this.switch0_active instanceof Error) {
