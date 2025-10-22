@@ -1,0 +1,30 @@
+{
+  "notificationFrame": {
+    "src": "shellyplusplugit-80646fcb9c74",
+    "dst": "hb-bridge",
+    "method": "NotifyStatus",
+    "params": {
+      "ts": 1760643646.77,
+      "switch:0": { "output": true, "source": "SHC" }
+    }
+  },
+  "responseFrame": {
+    "id": 0,
+    "src": "shellyplusplugit-80646fcb9c74",
+    "dst": "hb-bridge",
+    "result": {
+      "id": 0,
+      "source": "SHC",
+      "output": false,
+      "apower": 0.0,
+      "voltage": 230.8,
+      "current": 0.0,
+      "aenergy": {
+        "total": 757.246,
+        "by_minute": [0.0, 0.0, 0.0],
+        "minute_ts": 1760643960
+      },
+      "temperature": { "tC": 23.6, "tF": 74.6 }
+    }
+  }
+}
