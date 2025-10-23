@@ -24,11 +24,15 @@ export class Switch {
     logger: Logger,
   ) {
     this._deviceInfo = deviceInfo;
+    
     this._service =
       accessory.getService(platform.Service.Switch) ||
       accessory.addService(platform.Service.Switch);
+    
     this._platform = platform;
+    
     this._ws = ws;
+    
     this._logger = logger;
 
     // set the service name, this is what is displayed as the default name on the Home app
@@ -44,6 +48,16 @@ export class Switch {
       .getCharacteristic(this._platform.Characteristic.On)
       .onSet(this.setOn.bind(this)) // SET - bind to the `setOn` method below
       .onGet(this.getOn.bind(this)); // GET - bind to the `getOn` method below
+
+    this.initSwitchStatus();
+  }
+
+  async initSwitchStatus() {
+    for (let i = 0; i < 30 && this._ws?.wsStatus !== WebSocket.OPEN; i++) {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      this._logger.debug(`[SWITCH_${this._deviceInfo.id}] Waiting for WebSocket connection to open...`);
+    }
+    this._ws?.send('Switch.GetStatus', { id: 0 });
   }
 
   handleMessage(
@@ -51,7 +65,7 @@ export class Switch {
   ) {
     if ('src' in message && this._deviceInfo.id !== message.src) {
       this._logger.warn(
-        `Message received from different device: ${message.src}, ignoring it.`,
+        `[SWITCH_${this._deviceInfo.id}] Message received from different device: ${message.src}, ignoring it.`,
       );
       return;
     }
@@ -81,7 +95,7 @@ export class Switch {
       return;
     }
 
-    this._logger.info('External state change ->', on);
+    this._logger.info(`[SWITCH_${this._deviceInfo.id}] External state change ->`, on);
     this._status = on;
     this._service
       .getCharacteristic(this._platform.Characteristic.On)
@@ -98,7 +112,7 @@ export class Switch {
       return;
     }
 
-    this._logger.info('HomeKit set state:', value);
+    this._logger.info(`[SWITCH_${this._deviceInfo.id}] HomeKit set state:`, value);
     // implement your own code to turn your device on/off
     this._status = value as boolean;
     this._ws?.send('Switch.Set', { id: 0, on: value });
@@ -120,7 +134,7 @@ export class Switch {
      * this.service.updateCharacteristic(this.platform.Characteristic.On, true)
      */
   async getOn(): Promise<CharacteristicValue> {
-    this._logger.info('HomeKit get state ->', this._status);
+    this._logger.info(`[SWITCH_${this._deviceInfo.id}] HomeKit get state ->`, this._status);
 
     // if you need to return an error to show the device as "Not Responding" in the Home app:
     // if (this.switch0_active instanceof Error) {
