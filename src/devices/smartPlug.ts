@@ -18,7 +18,6 @@ export class SmartPlug extends Device {
   switch0: Switch;
   // Device WebSocket connection
   ws: RPCWebSocket | null = null;
- 
 
   constructor({ accessory, platform, deviceInfo, logger }: DeviceConstructor) {
     super({ accessory, platform, deviceInfo, logger });
@@ -33,15 +32,16 @@ export class SmartPlug extends Device {
 
     // initialize WebSocket connection
     this.initWebSocket();
-    
+
     // initialize device service: SWITCH_0
-    this.switch0 = new Switch(
+    this.switch0 = new Switch({
       deviceInfo,
+      deviceId: 0,
       accessory,
       platform,
-      this.ws,
-      this.logger,
-    );
+      ws: this.ws,
+      logger: this.logger,
+    });
 
     this.logger.info('SmartPlug handlers registered successfully');
   }

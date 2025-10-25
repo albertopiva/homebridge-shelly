@@ -1,4 +1,4 @@
-import { CharacteristicValue, PlatformAccessory, Service } from 'homebridge';
+import { CharacteristicValue, Service } from 'homebridge';
 import { ShellyPlatform } from '../platform';
 import { Logger } from '../services/logger';
 import { RPCWebSocket } from '../services/rpc/ws';
@@ -7,6 +7,7 @@ import {
   ShellyRPCSuccessResponse,
 } from '../@types/rpc/response';
 import { DeviceInfo } from '../@types/shelly';
+import { SwitchConstructor } from '../@types/switch';
 
 export class Switch {
   private _deviceInfo: DeviceInfo;
@@ -15,30 +16,26 @@ export class Switch {
   private _logger: Logger;
   private _platform: ShellyPlatform;
   private _ws: RPCWebSocket | null = null;
+  private _id: number = 1;
 
-  constructor(
-    deviceInfo: DeviceInfo,
-    accessory: PlatformAccessory,
-    platform: ShellyPlatform,
-    ws: RPCWebSocket | null,
-    logger: Logger,
-  ) {
-    this._deviceInfo = deviceInfo;
+  constructor(params: SwitchConstructor) {
+    this._deviceInfo = params.deviceInfo;
+    this._id = params.deviceId;
 
     this._service =
-      accessory.getService(platform.Service.Switch) ||
-      accessory.addService(platform.Service.Switch);
+      params.accessory.getService(params.platform.Service.Switch) ||
+      params.accessory.addService(params.platform.Service.Switch);
 
-    this._platform = platform;
+    this._platform = params.platform;
 
-    this._ws = ws;
+    this._ws = params.ws;
 
-    this._logger = logger;
+    this._logger = params.logger;
 
     // set the service name, this is what is displayed as the default name on the Home app
     this._service.setCharacteristic(
-      platform.Characteristic.Name,
-      accessory.context.device.name,
+      params.platform.Characteristic.Name,
+      params.accessory.context.device.name,
     );
 
     this._status = false;
@@ -49,15 +46,17 @@ export class Switch {
       .onSet(this.setOn.bind(this)) // SET - bind to the `setOn` method below
       .onGet(this.getOn.bind(this)); // GET - bind to the `getOn` method below
 
-    this._ws?.send('Switch.GetStatus', { id: 0 });
+    this._ws?.send('Switch.GetStatus', { id: this._id });
   }
 
   handleMessage(
-    message: ShellyRPCSuccessResponse | ShellyRPCNotificationFrame,
+    message:
+      | ShellyRPCSuccessResponse
+      | ShellyRPCNotificationFrame<{ output: boolean; source: string }>,
   ) {
     if ('src' in message && this._deviceInfo.id !== message.src) {
       this._logger.warn(
-        `[SWITCH_${this._deviceInfo.id}] Message received from different device: ${message.src}, ignoring it.`,
+        `[SWITCH_${this._id}] Message received from different device: ${message.src}, ignoring it.`,
       );
       return;
     }
@@ -70,10 +69,10 @@ export class Switch {
     // notificationFrame
     if (
       'params' in message &&
-      'switch:0' in message.params &&
-      'output' in message.params['switch:0']
+      `switch:${this._id}` in message.params &&
+      'output' in message.params[`switch:${this._id}`]
     ) {
-      newValue = message.params['switch:0'].output as boolean;
+      newValue = message.params[`switch:${this._id}`]?.output;
     }
 
     if (newValue !== null) {
@@ -87,10 +86,7 @@ export class Switch {
       return;
     }
 
-    this._logger.info(
-      `[SWITCH_${this._deviceInfo.id}] External state change ->`,
-      on,
-    );
+    this._logger.info(`[SWITCH_${this._id}] External state change ->`, on);
     this._status = on;
     this._service
       .getCharacteristic(this._platform.Characteristic.On)
@@ -107,10 +103,7 @@ export class Switch {
       return;
     }
 
-    this._logger.info(
-      `[SWITCH_${this._deviceInfo.id}] HomeKit set state:`,
-      value,
-    );
+    this._logger.info(`[SWITCH_${this._id}] HomeKit set state:`, value);
     // implement your own code to turn your device on/off
     this._status = value as boolean;
     this._ws?.send('Switch.Set', { id: 0, on: value });
@@ -133,7 +126,7 @@ export class Switch {
      */
   async getOn(): Promise<CharacteristicValue> {
     this._logger.info(
-      `[SWITCH_${this._deviceInfo.id}] HomeKit get state ->`,
+      `[SWITCH_${this._id}] HomeKit get state ->`,
       this._status,
     );
 
