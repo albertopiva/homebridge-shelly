@@ -110,9 +110,19 @@ export class RPCWebSocket {
     }
   }
 
-  private sendRequest(request: ShellyRPCRequest) {
+  private async sendRequest(request: ShellyRPCRequest) {
     this.id++;
     const req = JSON.stringify(request);
+    for (let i = 0; i <= 30 && this.conn.readyState !== WebSocket.OPEN; i++) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      if (i === 30) {
+        this.logger.error(
+          'WebSocket connection timeout. Unable to send request.',
+        );
+      } else {
+        this.logger.debug('Waiting for WebSocket connection to open...');
+      }
+    }
     this.conn.send(req);
     this.logger?.debug('Request sent:', req);
   }
