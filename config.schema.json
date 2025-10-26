@@ -39,12 +39,8 @@
               "title": "IP address or hostname",
               "description": "Set this value if your device can't be discovered automatically.",
               "type": "string",
-              "placeholder": "e.g. 192.168.1.100"
-            },
-            "password": {
-              "title": "Password",
-              "type": "string",
-              "description": "The password to use if the Shelly device requires authentication."
+              "placeholder": "e.g. 192.168.1.100",
+              "required": true
             }
           }
         }

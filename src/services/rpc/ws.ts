@@ -13,6 +13,8 @@ export class RPCWebSocket {
   readonly LogMessage = '[RPC WS]';
 
   private conn: WebSocket;
+  // current WebSocket connection status
+  public wsStatus: WebSocket['readyState'];
   private address: string | URL;
   private id: number;
   private logger;
@@ -25,6 +27,7 @@ export class RPCWebSocket {
     this.src = src || 'hb-bridge';
     this.logger = new Logger(logger, '[RPC WS]');
     this.logger?.debug(`WebSocket initialized to address ${this.address}`);
+    this.wsStatus = this.conn.readyState;
   }
 
   public open(method: string, params?: object) {
@@ -38,6 +41,7 @@ export class RPCWebSocket {
         src: this.src,
       };
       this.sendRequest(req);
+      this.wsStatus = this.conn.readyState;
     });
   }
 
@@ -48,6 +52,7 @@ export class RPCWebSocket {
   ) {
     this.conn.on('message', (msg: Buffer) => {
       try {
+        this.wsStatus = this.conn.readyState;
         const data: ShellyRPCSuccessResponse | ShellyRPCNotificationFrame =
           JSON.parse(msg.toString());
         callback?.(data);
@@ -83,6 +88,7 @@ export class RPCWebSocket {
 
   public close(callback?: () => void) {
     this.conn.on('close', () => {
+      this.wsStatus = this.conn.readyState;
       callback?.();
       this.logger?.warn('WebSocket closed');
     });
@@ -104,9 +110,19 @@ export class RPCWebSocket {
     }
   }
 
-  private sendRequest(request: ShellyRPCRequest) {
+  private async sendRequest(request: ShellyRPCRequest) {
     this.id++;
     const req = JSON.stringify(request);
+    for (let i = 0; i <= 30 && this.conn.readyState !== WebSocket.OPEN; i++) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      if (i === 30) {
+        this.logger.error(
+          'WebSocket connection timeout. Unable to send request.',
+        );
+      } else {
+        this.logger.debug('Waiting for WebSocket connection to open...');
+      }
+    }
     this.conn.send(req);
     this.logger?.debug('Request sent:', req);
   }

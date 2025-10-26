@@ -29,9 +29,10 @@ export type ShellyRPCResponse =
  * - method: The method invoked.
  * - params: The parameters of the notification.
  */
-export interface ShellyRPCNotificationFrame {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface ShellyRPCNotificationFrame<T = any> {
   src: string;
   dst: string;
   method: string;
-  params: Record<string, object>;
+  params: Record<string,  T >;
 }

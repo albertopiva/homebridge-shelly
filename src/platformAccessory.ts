@@ -1,4 +1,4 @@
-import type {  PlatformAccessory } from 'homebridge';
+import type { PlatformAccessory } from 'homebridge';
 
 import type { ShellyPlatform } from './platform.js';
 import { DeviceConfig } from './@types/config.js';
@@ -22,6 +22,11 @@ export class ShellyPlatformAccessory {
     const shellyDevice: DeviceConfig = accessory.context.device;
     this.logger = new Logger(this.platform.log, `[${shellyDevice.name}]`);
 
+    if (shellyDevice.exclude) {
+      this.logger.info('Device excluded, skipping setup.');
+      return;
+    }
+
     const response = fetch(
       `http://${shellyDevice.network_id}/rpc/Shelly.GetDeviceInfo`,
     );
@@ -32,7 +37,7 @@ export class ShellyPlatformAccessory {
           this.logger.debug(`Device Info: ${JSON.stringify(data)}`);
           switch (data.model) {
             case ShellyModels.PlusPlugIT:
-            case ShellyModels.PlusPlugEU:
+            case ShellyModels.PlusPlugS:
             case ShellyModels.PlusPlugUS:
               new SmartPlug({
                 platform,
