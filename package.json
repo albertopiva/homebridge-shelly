@@ -1,5 +1,5 @@
 {
-  "name": "@ap/homebridge-shelly",
+  "name": "@ap17/homebridge-shelly",
   "displayName": "Homebridge Shelly Integration",
   "type": "module",
   "version": "1.0.0",
