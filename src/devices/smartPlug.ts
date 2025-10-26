@@ -10,7 +10,8 @@ import { Switch } from '../characteristics/switch.js';
 
 export class SmartPlug extends Device {
   readonly allowedModels: ShellyModelCode[] = [
-    ShellyModels.PlusPlugEU,
+    ShellyModels.PlusPlugS,
+    ShellyModels.PlusPlugSv2,
     ShellyModels.PlusPlugIT,
     ShellyModels.PlusPlugUS,
   ];

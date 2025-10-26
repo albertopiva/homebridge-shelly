@@ -37,7 +37,7 @@ export class ShellyPlatformAccessory {
           this.logger.debug(`Device Info: ${JSON.stringify(data)}`);
           switch (data.model) {
             case ShellyModels.PlusPlugIT:
-            case ShellyModels.PlusPlugEU:
+            case ShellyModels.PlusPlugS:
             case ShellyModels.PlusPlugUS:
               new SmartPlug({
                 platform,
