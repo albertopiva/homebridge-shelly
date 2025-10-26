@@ -2,7 +2,7 @@
   "name": "@ap17/homebridge-shelly",
   "displayName": "Homebridge Shelly Integration",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "description": "Homebridge Shelly Integration Plugin",
   "author": "Alberto Piva",
