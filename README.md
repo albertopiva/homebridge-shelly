@@ -18,7 +18,7 @@ This plugin allows you to view and control your Shelly devices within HomeKit.
 
 To use this plugin, you will need to already have:
 
-- Node: `v18` || `v20` || `v22`
+- Node: `v18` || `v20` || `v22` || `v24`
 - Homebridge: `v1.8.0` || `v2.0.0-beta.0`
 
 ## Supported devices
